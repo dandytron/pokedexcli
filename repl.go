@@ -7,19 +7,15 @@ import (
 	"strings"
 )
 
-//type config struct {
-//pokeapiClient    pokeapi.Client
-//nextLocationsURL *string
-//prevLocationsURL *string
-//}
-
-func startRepl() {
+func startRepl(cfg *config) {
 	reader := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
 		reader.Scan()
 
-		words := cleanInput(reader.Text())
+		text := reader.Text()
+
+		words := cleanInput(text)
 		if len(words) == 0 {
 			continue
 		}
@@ -28,15 +24,13 @@ func startRepl() {
 
 		// checks a slice of commands to see if user's command exists
 		command, ok := getCommands()[commandName]
-		if ok {
-			err := command.callback()
-			if err != nil {
-				fmt.Println(err)
-			}
+		if !ok {
+			fmt.Println("Invalid command")
 			continue
-		} else {
-			fmt.Println("Unknown command")
-			continue
+		}
+		err := command.callback(cfg)
+		if err != nil {
+			fmt.Println(err)
 		}
 	}
 }
@@ -50,7 +44,7 @@ func cleanInput(input string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -70,10 +64,10 @@ func getCommands() map[string]cliCommand {
 			description: "Displays the next 20 locations in the Pokemon world",
 			callback:    commandMap,
 		},
-		//"mapb": {
-		//name:        "mapb",
-		//description: "Displays the previous 20 locations in the Pokemon world",
-		//callback:    commandMap,
-		//},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the previous 20 locations in the Pokemon world",
+			callback:    commandMapBack,
+		},
 	}
 }

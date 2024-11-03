@@ -4,7 +4,7 @@ import "fmt"
 
 // Code for behavior upon receiving 'help' as a command-line argument
 
-func commandHelp() error {
+func commandHelp(cfg *config) error {
 	fmt.Println("\nWelcome to the Pokedex!\nUsage:")
 	fmt.Println()
 	for _, cmd := range getCommands() {
