@@ -1,22 +1,26 @@
 package pokecache
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestCreateCache(t *testing.T) {
-	cache := newCache()
+	cache := NewCache(time.Millisecond)
 	if cache.cache == nil {
 		t.Error("cache is nil")
 	}
 }
 
 func TestAddGetToCache(t *testing.T) {
-	cache := newCache()
+	cache := NewCache(time.Millisecond)
 
 	cases := []struct {
 		inputKey string
 		inputVal []byte
 	}{
-		{inputKey: "key1",
+		{
+			inputKey: "key1",
 			inputVal: []byte("val1"),
 		},
 		{
@@ -45,4 +49,40 @@ func TestAddGetToCache(t *testing.T) {
 			continue
 		}
 	}
+}
+
+func TestReap(t *testing.T) {
+	interval := time.Millisecond * 10
+	cache := NewCache(interval)
+
+	keyOne := "key1"
+
+	cache.Add(keyOne, []byte("val1"))
+
+	time.Sleep(interval + time.Millisecond)
+
+	_, ok := cache.Get(keyOne)
+	if ok {
+		t.Errorf("%s should have been reaped", keyOne)
+	}
+
+}
+
+func TestReapFail(t *testing.T) {
+	interval := time.Millisecond * 10
+	cache := NewCache(interval)
+
+	keyOne := "key1"
+
+	cache.Add(keyOne, []byte("val1"))
+
+	time.Sleep(interval / 2)
+
+	// We are not sleeping for the full interval, so we expect the value
+	// to be there. If it is not there, something went wrong.
+	_, ok := cache.Get(keyOne)
+	if !ok {
+		t.Errorf("%s should not have been reaped", keyOne)
+	}
+
 }
