@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func (c *Client) ListLocationAreas(pageURL *string) (LocationAreasResp, error) {
+func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 	endpoint := "/location-area"
 	fullURL := baseURL + endpoint
 
@@ -19,42 +19,42 @@ func (c *Client) ListLocationAreas(pageURL *string) (LocationAreasResp, error) {
 	dat, ok := c.cache.Get(fullURL)
 	if ok {
 		//cache hit
-		fmt.Println("Cache hit.")
-		locationAreasResp := LocationAreasResp{}
+		locationAreasResp := RespShallowLocations{}
 		err := json.Unmarshal(dat, &locationAreasResp)
 		if err != nil {
-			return LocationAreasResp{}, err
+			return RespShallowLocations{}, err
 		}
 		return locationAreasResp, nil
 
 	}
 
+	//cache miss, continue logic below
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
-		return LocationAreasResp{}, err
+		return RespShallowLocations{}, err
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return LocationAreasResp{}, err
+		return RespShallowLocations{}, err
 	}
 	defer resp.Body.Close()
 
 	// Redirects should be handled internally by the go client, so can check above the 300s
 	if resp.StatusCode > 399 {
-		return LocationAreasResp{}, fmt.Errorf("bad status code: %v", resp.StatusCode)
+		return RespShallowLocations{}, fmt.Errorf("bad status code: %v", resp.StatusCode)
 	}
 
 	dat, err = io.ReadAll(resp.Body)
 	if err != nil {
-		return LocationAreasResp{}, err
+		return RespShallowLocations{}, err
 	}
 
 	// Unmarshall the json data into an instance of our struct
-	locationAreasResp := LocationAreasResp{}
+	locationAreasResp := RespShallowLocations{}
 	err = json.Unmarshal(dat, &locationAreasResp)
 	if err != nil {
-		return LocationAreasResp{}, err
+		return RespShallowLocations{}, err
 	}
 
 	c.cache.Add(fullURL, dat)
