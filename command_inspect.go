@@ -16,7 +16,7 @@ func commandInspect(cfg *config, args ...string) error {
 	// Check for the monster's name as a key in the pokedex map
 	pokemonData, ok := cfg.caughtPokedex[pokemonName]
 	if !ok {
-		fmt.Println("you have not caught that pokemon")
+		return errors.New("you have not caught that pokemon")
 	}
 	fmt.Printf("Name: %s\n", pokemonData.Name)
 	fmt.Printf("Height: %v\n", pokemonData.Height)
