@@ -6,7 +6,6 @@ import (
 )
 
 func commandExplore(cfg *config, args ...string) error {
-	fmt.Printf("Debug: Starting explore command with args: %v\n", args)
 	if len(args) != 1 {
 		return errors.New("you must provide a location name")
 	}
@@ -16,8 +15,6 @@ func commandExplore(cfg *config, args ...string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Debug: Location name: %s\n", location.Name)
-	fmt.Printf("Debug: Number of Pokemon encounters: %d\n", len(location.PokemonEncounters))
 
 	fmt.Printf("Exploring %s...\n", location.Name)
 	fmt.Println("Found Pokemon:")

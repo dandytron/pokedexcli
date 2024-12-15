@@ -43,10 +43,9 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 	return entry.val, ok
 }
 
-// reapLoop -
+// reapLoop - had errors with this earlier because I stuck a mutex in
+// here and it never unlocked, because, you know, its a loop!
 func (c *Cache) reapLoop(interval time.Duration) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
 	ticker := time.NewTicker(interval)
 	for range ticker.C {
 		// this will run every interval - if 5 mins, every 5 mins

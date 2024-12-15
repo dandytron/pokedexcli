@@ -5,7 +5,16 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/dandytron/pokedexcli/internal/pokeapi"
 )
+
+type config struct {
+	pokeapiClient       pokeapi.Client
+	nextLocationAreaURL *string
+	prevLocationAreaURL *string
+	caughtPokedex       map[string]pokeapi.Pokemon
+}
 
 func startRepl(cfg *config) {
 	reader := bufio.NewScanner(os.Stdin)
@@ -53,10 +62,10 @@ type cliCommand struct {
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
-		"help": {
-			name:        "help",
-			description: "Displays a help message",
-			callback:    commandHelp,
+		"catch": {
+			name:        "catch",
+			description: "Attempt to catch a pokemon",
+			callback:    commandCatch,
 		},
 		"exit": {
 			name:        "exit",
@@ -67,6 +76,16 @@ func getCommands() map[string]cliCommand {
 			name:        "explore <location name>",
 			description: "Display the names of Pokemon in a given area",
 			callback:    commandExplore,
+		},
+		"help": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Displays information about a pokemon if it has been caught",
+			callback:    commandInspect,
 		},
 		"map": {
 			name:        "map",
